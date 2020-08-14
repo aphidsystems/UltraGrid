@@ -1402,6 +1402,38 @@ fi
 if test $rtsp_server_req = yes -a $rtsp_server = no; then
         AC_MSG_ERROR([rtsp server not found, check live555 -livemedia lib- dependencies...]);
 fi
+# -------------------------------------------------------------------------------------------------
+# SRT
+# -------------------------------------------------------------------------------------------------
+RTSP_SERVER_INC=
+RTSP_SERVER_OBJ=
+rtsp_server=no
+livemedia=no
+livemedia_prefix=/usr
+
+AC_ARG_ENABLE(srt,
+[  --enable-srt            enables SRT server support (default is auto)]
+[                          Requires: srt],
+    [srt_req=$enableval],
+    [srt_req=$build_default]
+    )
+
+SAVED_CFLAGS=$CFLAGS
+SAVED_LIBS=$LIBS
+AC_CHECK_HEADERS([srt/srt.h])
+AC_CHECK_LIB(srt, srt_send)
+CFLAGS=$SAVED_CFLAGS
+LIBS=$SAVED_LIBS
+
+if test $srt_req != no -a $ac_cv_header_srt_srt_h = yes -a $ac_cv_lib_srt_srt_send = yes
+then
+        ADD_MODULE("video_rxtx_srt", "src/video_rxtx/srt.o", "-lsrt")
+        srt=yes
+fi
+
+if test $srt_req = yes -a $srt = no; then
+        AC_MSG_ERROR([SRT required but dependencies (headers, lib) were not found!]);
+fi
 
 # ----------------------------------------------------------------------
 # SDP over HTTP
@@ -3246,6 +3278,7 @@ RESULT=`add_column "$RESULT" "RTSP server" $rtsp_server $?`
 RESULT=`add_column "$RESULT" "Scale postprocessor" $scale $?`
 RESULT=`add_column "$RESULT" "SDP over HTTP" $sdp_http $?`
 RESULT=`add_column "$RESULT" "Spout" $spout $?`
+RESULT=`add_column "$RESULT" "SRT" $srt $?`
 RESULT=`add_column "$RESULT" "Syphon" $syphon $?`
 RESULT=`add_column "$RESULT" "Testcard extras" $testcard_extras $?`
 RESULT=`add_column "$RESULT" "Text postprocess and filter" $text $?`

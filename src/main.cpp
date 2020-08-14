@@ -99,6 +99,7 @@
 #include "video_compress.h"
 #include "export.h"
 #include "video_rxtx.h"
+#include "video_rxtx/srt.hpp" // SRT_LOOPBACK
 #include "audio/audio.h"
 #include "audio/audio_capture.h"
 #include "audio/audio_playback.h"
@@ -1150,6 +1151,13 @@ int main(int argc, char *argv[])
                 }
                 if (audio_codec == nullptr) {
                         audio_codec = DEFAULT_AUDIO_CODEC;
+                }
+        }
+
+        if (strcasecmp(video_protocol, "srt") == 0) {
+                video_rx_port = video_tx_port = port_base;
+                if (argc == 0) {
+                        requested_receiver = SRT_LOOPBACK;
                 }
         }
 
