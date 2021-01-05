@@ -5,6 +5,11 @@
 ARCH=$1
 BUILD_DIR=$2
 
+APPIMAGE_ARCH=$ARCH
+if [ $ARCH != armhf ]; then
+        APPIMAGE_ARCH=aarch64
+fi
+
 sudo chroot $BUILD_DIR /bin/sh -ec 'if grep -q Raspbian /etc/os-release; then sed -i s-http://deb.debian.org/debian-http://mirrordirector.raspbian.org/raspbian/- /etc/apt/sources.list; apt-get -y update; fi' # https://bugs.launchpad.net/ubuntu/+source/qemu/+bug/1670905 workaround
 sudo chroot $BUILD_DIR /bin/sh -ec 'apt-get -y install build-essential git pkg-config autoconf automake libtool'
 sudo chroot $BUILD_DIR /bin/sh -ec 'apt-get -y install portaudio19-dev libsdl2-dev libglib2.0-dev libglew-dev libcurl4-openssl-dev freeglut3-dev libssl-dev libjack-dev libasound2-dev'
@@ -20,6 +25,6 @@ if [ $ARCH = armhf ]; then # Raspbian - build own FFmpeg with OMX camera patch
 else
         sudo chroot $BUILD_DIR /bin/sh -ec 'apt-get -y install libavcodec-dev libavformat-dev libswscale-dev'
 fi
-sudo chroot $BUILD_DIR /bin/sh -ec 'apt-get -y install desktop-file-utils git-core libfuse-dev libcairo2-dev cmake wget zsync' # to build appimagetool
-sudo chroot $BUILD_DIR /bin/sh -ec 'git clone https://github.com/AppImage/AppImageKit.git && cd AppImageKit && ./build.sh && cd build && cmake -DAUXILIARY_FILES_DESTINATION= .. && make install || exit 1'
-sudo chroot $BUILD_DIR /bin/sh -ec 'rm -rf AppImageKit; apt-get -y clean'
+sudo chroot $BUILD_DIR /bin/sh -ec 'apt-get -y install curl' # to download AppImageTool
+sudo chroot $BUILD_DIR /bin/sh -ec "curl -L -o /usr/local/bin/appimagetool https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-${APPIMAGE_ARCH}.AppImage"
+sudo chroot $BUILD_DIR /bin/sh -ec 'apt-get -y clean'
