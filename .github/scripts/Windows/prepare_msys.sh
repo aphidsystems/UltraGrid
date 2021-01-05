@@ -35,6 +35,7 @@ EOF
 
 . ~/.bash_profile
 
+pacman -Syu --noconfirm --disable-download-timeout
 PACMAN_INSTALL='pacman -Sy --needed --noconfirm --disable-download-timeout'
 # Install MSYS2 packages
 $PACMAN_INSTALL automake autoconf git make pkgconf mingw-w64-x86_64-binutils mingw-w64-x86_64-gcc mingw-w64-x86_64-cppunit unzip zip
